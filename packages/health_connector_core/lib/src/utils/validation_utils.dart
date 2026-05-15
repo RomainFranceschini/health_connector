@@ -30,7 +30,12 @@ void require<T>({
   }
 }
 
-/// Validates that [endTime] is strictly after [startTime].
+/// Validates that [endTime] is at or after [startTime].
+///
+/// HealthKit emits zero-duration samples for instantaneous measurements
+/// (heart rate snapshots, body mass readings, single-point distance
+/// deltas), so equal timestamps must be accepted; only a negative
+/// duration is rejected.
 ///
 /// ## Parameters
 ///
@@ -39,7 +44,7 @@ void require<T>({
 ///
 /// ## Throws
 ///
-/// - [ArgumentError] if [endTime] is not strictly after [startTime].
+/// - [ArgumentError] if [endTime] is strictly before [startTime].
 ///
 /// @nodoc
 @sinceV1_0_0
@@ -48,11 +53,11 @@ void requireEndTimeAfterStartTime({
   required DateTime startTime,
   required DateTime endTime,
 }) {
-  if (!endTime.isAfter(startTime)) {
+  if (endTime.isBefore(startTime)) {
     throw ArgumentError.value(
       endTime,
       'endTime',
-      'endTime must be after startTime. '
+      'endTime must be at or after startTime. '
           'Got startTime=$startTime, endTime=$endTime',
     );
   }
